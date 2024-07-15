@@ -1,0 +1,29 @@
+name: Deploy Migrations to Develop
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    environment: Develop
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SB_DEVELOP_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SB_DEVELOP_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SB_DEVELOP_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: supabase db push
